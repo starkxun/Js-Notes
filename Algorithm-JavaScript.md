@@ -872,6 +872,242 @@ console.table(intersect(nums1,nums2));
 
 
 
+
+
+#### 加一
+
+给定一个由 整数 组成的 非空 数组所表示的非负整数，在该数的基础上加一。
+
+最高位数字存放在数组的首位， 数组中每个元素只存储单个数字。
+
+你可以假设除了整数 0 之外，这个整数不会以零开头。
+
+示例1
+
+> 输入：digits = [1,2,3]
+> 输出：[1,2,4]
+> 解释：输入数组表示数字 123。
+
+示例2
+
+> 输入：digits = [4,3,2,1]
+> 输出：[4,3,2,2]
+> 解释：输入数组表示数字 4321。
+
+示例3
+
+> 输入：digits = [0]
+> 输出：[1]
+
+
+
+题解代码：
+
+```javascript
+digits = [9,9,9,9];
+var plusOne = function(digits) {
+    digits[digits.length-1] += 1;
+    for(let i=1;i<digits.length;i++){
+        if(digits[digits.length-i]>9){
+            digits[digits.length-i]-=10;
+            digits[digits.length-i-1]+=1;
+        }
+    }
+    if(digits[0]>9){        //特判，最高位进一
+        digits[0]-=10;
+        digits.unshift(1);
+    }
+    return digits;
+};
+result = plusOne(digits);
+console.log(result);
+```
+
+这题的思路和高精度一样，模拟进位就可以了。
+
+
+
+
+
+
+
+
+
+
+
+#### 移动零
+
+给定一个数组 `nums`，编写一个函数将所有 `0` 移动到数组的末尾，同时保持非零元素的相对顺序。
+
+**请注意** ，必须在不复制数组的情况下原地对数组进行操作。
+
+示例1
+
+> 输入: nums = [0,1,0,3,12]
+> 输出: [1,3,12,0,0]
+
+示例2
+
+> 输入: nums = [0]
+> 输出: [0]
+
+
+
+
+
+题解代码
+
+```javascript
+nums = [0,0,1];
+var moveZeroes = function(nums) {       //不能够正着扫，会出现漏扫的情况，例如[0,0,1]
+    for(let i=nums.length-1;i>=0;i--){
+        if(nums[i]===0){
+            nums.splice(i,1);
+            nums.push(0);
+        }
+    }
+    return nums;
+};
+result = moveZeroes(nums);
+console.log(result);
+```
+
+这里直接模即可，扫一遍，把0删除，然后在末尾插入。全部使用js的内置函数。需要注意不能正着扫，会出现漏扫的情况，例如[0,0,1]这种就会出现错误，输出结果是[0,1,0]。
+
+
+
+
+
+
+
+
+
+#### 两数之和
+
+给定一个整数数组 nums 和一个整数目标值 target，请你在该数组中找出 和为目标值 target  的那 两个 整数，并返回它们的数组下标。
+
+你可以假设每种输入只会对应一个答案。但是，数组中同一个元素在答案里不能重复出现。
+
+你可以按任意顺序返回答案。
+
+示例1
+
+> 输入：nums = [2,7,11,15], target = 9
+> 输出：[0,1]
+> 解释：因为 nums[0] + nums[1] == 9 ，返回 [0, 1] 。
+
+示例2
+
+> 输入：nums = [3,2,4], target = 6
+> 输出：[1,2]
+
+示例3
+
+> 输入：nums = [3,3], target = 6
+> 输出：[0,1]
+
+
+
+题解代码1
+
+```javascript
+nums = [3,2,4];
+target = 6;
+var twoSum = function(nums, target) {
+    result = [];
+    for(let i=0;i<nums.length-1;i++){
+        for(let j=i+1;j<nums.length;j++){
+            if(nums[i]+nums[j]===target){
+            result.push(i);
+            result.push(j);
+            return result;
+        }
+    }
+}
+}
+result = twoSum(nums,target);
+console.log(result);
+```
+
+这是使用两遍for循环暴力解的，效率很低。
+
+
+
+
+
+
+
+#### 旋转图像
+
+给定一个 n × n 的二维矩阵 matrix 表示一个图像。请你将图像顺时针旋转 90 度。
+
+你必须在 原地 旋转图像，这意味着你需要直接修改输入的二维矩阵。请不要 使用另一个矩阵来旋转图像。
+
+示例1
+
+![img](https://assets.leetcode.com/uploads/2020/08/28/mat1.jpg)
+
+> 输入：matrix = [[1,2,3],[4,5,6],[7,8,9]]
+> 输出：[[7,4,1],[8,5,2],[9,6,3]]
+
+
+
+示例2
+
+![](https://assets.leetcode.com/uploads/2020/08/28/mat2.jpg)
+
+> 输入：matrix = [[5,1,9,11],[2,4,8,10],[13,3,6,7],[15,14,12,16]]
+> 输出：[[15,13,2,5],[14,3,4,1],[12,6,8,9],[16,7,10,11]]
+
+
+
+题解代码：
+
+```javascript
+matrix = [[1,2,3],[4,5,6],[7,8,9]];
+var rotate = function(matrix) {
+    //先上下交换
+    for(let i=0;i<matrix.length/2;i++){
+        temp = matrix[i];
+        matrix[i] = matrix[matrix.length-i-1];
+        matrix[matrix.length-i-1] = temp;
+    }
+    //再对角线交换
+    for(let i=0;i<matrix.length;++i){
+        for(let j=i+1;j<matrix.length;++j){
+            temp = matrix[i][j];
+            matrix[i][j] = matrix[j][i];
+            matrix[j][i] = temp;
+
+        }
+    }
+    return matrix;
+}
+
+result = rotate(matrix);
+console.log(result);
+```
+
+解题思路就是先上下交换，然后再对角线交换。有点找规律的感觉。当然也可以模拟。具体图示见leetcode
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### 栈
 
 #### 一个简单的栈结构

@@ -1,0 +1,12 @@
+nums = [0,0,1];
+var moveZeroes = function(nums) {       //不能够正着扫，会出现漏扫的情况，例如[0,0,1]
+    for(let i=nums.length-1;i>=0;i--){
+        if(nums[i]===0){
+            nums.splice(i,1);
+            nums.push(0);
+        }
+    }
+    return nums;
+};
+result = moveZeroes(nums);
+console.log(result);
