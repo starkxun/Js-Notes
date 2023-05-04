@@ -1100,6 +1100,270 @@ console.log(result);
 
 
 
+### 字符串
+
+
+
+#### 反转字符串
+
+编写一个函数，其作用是将输入的字符串反转过来。输入字符串以字符数组 s 的形式给出。
+
+不要给另外的数组分配额外的空间，你必须原地修改输入数组、使用 O(1) 的额外空间解决这一问题。
+
+示例1
+
+> 输入：s = ["h","e","l","l","o"]
+> 输出：["o","l","l","e","h"]
+
+示例2
+
+> 输入：s = ["H","a","n","n","a","h"]
+> 输出：["h","a","n","n","a","H"]
+
+题解代码
+
+```javascript
+let s = "abcdefg";
+var reverseString = function(s) {
+    let len = s.length;
+    let left = 0, right = len - 1;
+    while(left < right) {
+      [s[left++], s[right--]] = [s[right], s[left]]
+    }
+  };
+```
+
+采用双指针的方法交换赋值。
+
+
+
+
+
+#### 整数反转
+
+给你一个 32 位的有符号整数 x ，返回将 x 中的数字部分反转后的结果。
+
+如果反转后整数超过 32 位的有符号整数的范围 [−231,  231 − 1] ，就返回 0。
+
+假设环境不允许存储 64 位整数（有符号或无符号）。
+
+示例1
+
+> 输入：x = 123
+> 输出：321
+
+示例2
+
+> 输入：x = -123
+> 输出：-321
+
+示例3
+
+> 输入：x = 120
+> 输出：21
+
+示例4
+
+> 输入：x = 0
+> 输出：0
+
+
+
+题解代码：
+
+```javascript
+let x = 1563847412;
+var reverseNum = function(x){
+    let res = 0;
+    let maxValue = Math.pow(2,31)-1;
+    let minValue = maxValue * (-1);
+    while (x!=0){
+        res = res *  10 + parseInt(x%10);
+        if(res>maxValue||res<minValue) return 0;
+        x = parseInt(x/10);		//这里使用parseInt是因为js的除法默认会保留小数
+    }
+    return res;
+}
+let result = reverseNum(x);
+console.log(result);
+```
+
+
+
+
+
+
+
+
+
+#### 字符串中的第一个唯一字符
+
+给定一个字符串 `s` ，找到 *它的第一个不重复的字符，并返回它的索引* 。如果不存在，则返回 `-1` 。
+
+ 示例1
+
+> 输入: s = "leetcode"
+> 输出: 0
+
+示例2
+
+> 输入: s = "loveleetcode"
+> 输出: 2
+
+示例3
+
+> 输入: s = "aabb"
+> 输出: -1
+
+
+
+题解代码
+
+```javascript
+s = "loveleetcode";
+var firstUniqChar = function(s) {
+    for(let i=0;i<s.length;i++){
+        if(s.indexOf(s[i])===s.lastIndexOf(s[i]))
+            return i;
+    }
+    return -1;
+};
+result = firstUniqChar(s);
+console.log(result);
+```
+
+JavaScript 解法
+只要第一个和最后一个的索引一致，那肯定是只有这个是对的了
+
+
+
+
+
+
+
+#### 有效的字母异位词
+
+有效的字母异位词
+给定两个字符串 s 和 t ，编写一个函数来判断 t 是否是 s 的字母异位词。
+
+注意：若 s 和 t 中每个字符出现的次数都相同，则称 s 和 t 互为字母异位词。
+
+示例1
+
+> 输入: s = "anagram", t = "nagaram"
+> 输出: true
+
+示例2
+
+> 输入: s = "rat", t = "car"
+> 输出: false
+
+
+
+题解代码：
+
+```javascript
+s = "rat";
+t = "car";
+var isAnagram = function(s, t) {
+    let Slen = s.length;
+    let Tlen = t.length;
+    if(Slen!==Tlen){;return false;}
+    for(let i=0;i<Tlen;i++){
+      t=t.replace(s[i],'');
+    }
+    if(t.length==0) {;return true;}
+    return  false;
+};
+result = isAnagram(s,t);
+console.log(result);
+```
+
+这里使用了一个简单的方法，先统计长度，如果长度不同，那一定不等。然后使用`repalce`方法排除相同的字符，如果最后长度归0，那么满足条件。
+
+
+
+
+
+
+
+
+
+#### 验证回文串
+
+如果在将所有大写字符转换为小写字符、并移除所有非字母数字字符之后，短语正着读和反着读都一样。则可以认为该短语是一个 回文串 。
+
+字母和数字都属于字母数字字符。
+
+给你一个字符串 s，如果它是 回文串 ，返回 true ；否则，返回 false 。
+
+示例1
+
+> 输入: s = "A man, a plan, a canal: Panama"
+> 输出：true
+> 解释："amanaplanacanalpanama" 是回文串。
+
+示例2
+
+> 输入：s = "race a car"
+> 输出：false
+> 解释："raceacar" 不是回文串。
+
+示例3
+
+> 输入：s = " "
+> 输出：true
+> 解释：在移除非字母数字字符之后，s 是一个空字符串 "" 。
+> 由于空字符串正着反着读都一样，所以是回文串。
+
+
+
+题解代码：
+
+```javascript
+s = "A man, a plan, a canal: Panama";
+var isPalindrome = function(s) {
+    let format = s.replace(/[^A-Za-z0-9]/gi,'').toLowerCase().split('');
+    return format.join('') === format.reverse().join('')
+};
+result = isPalindrome(s);
+console.log(result);
+```
+
+先匹配出数组里的字母然后转换成小写，然后使用`join()`方法将数组转换成字符串，判断是否相等。
+
+这里贴一些`join`方法：
+
+> **作用：**
+> 用于把数组中的所有元素放入一个字符串中，元素通过指定的分隔符进行分割。
+> arrayObject.join(separator);默认是用逗号做分隔符
+
+> **返回值：**
+> 返回一个字符串，该字符串是通过把arrayObject的每个元素转换为字符串，然后把这些字符串连接起来，在两个元素之间插入separator字母串而生成的。
+
+示例
+
+```javascript
+var arr = new Array(3);
+arr[0] = "George"
+arr[1] = "John"
+arr[2] = "Thomas"
+
+document.write(arr.join()); // George,John,Thomas
+
+document.write(arr.join("."));	//George.John.Thomas
+```
+
+
+
+
+
+
+
+
+
+
+
 
 
 
