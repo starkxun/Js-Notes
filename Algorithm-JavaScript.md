@@ -1364,6 +1364,197 @@ document.write(arr.join("."));	//George.John.Thomas
 
 
 
+#### 字符串转整数
+
+请你来实现一个 myAtoi(string s) 函数，使其能将字符串转换成一个 32 位有符号整数（类似 C/C++ 中的 atoi 函数）。
+
+函数 myAtoi(string s) 的算法如下：
+
+读入字符串并丢弃无用的前导空格
+检查下一个字符（假设还未到字符末尾）为正还是负号，读取该字符（如果有）。 确定最终结果是负数还是正数。 如果两者都不存在，则假定结果为正。
+读入下一个字符，直到到达下一个非数字字符或到达输入的结尾。字符串的其余部分将被忽略。
+将前面步骤读入的这些数字转换为整数（即，"123" -> 123， "0032" -> 32）。如果没有读入数字，则整数为 0 。必要时更改符号（从步骤 2 开始）。
+如果整数数超过 32 位有符号整数范围 [−231,  231 − 1] ，需要截断这个整数，使其保持在这个范围内。具体来说，小于 −231 的整数应该被固定为 −231 ，大于 231 − 1 的整数应该被固定为 231 − 1 。
+返回整数作为最终结果。
+注意：
+
+本题中的空白字符只包括空格字符 ' ' 。
+除前导空格或数字后的其余字符串外，请勿忽略 任何其他字符。
+
+示例1
+
+> 输入：s = "42"
+> 输出：42
+> 解释：加粗的字符串为已经读入的字符，插入符号是当前读取的字符。
+> 第 1 步："42"（当前没有读入字符，因为没有前导空格）
+>       ^
+> 第 2 步："42"（当前没有读入字符，因为这里不存在 '-' 或者 '+'）
+>       ^
+> 第 3 步："42"（读入 "42"）
+>         ^
+> 解析得到整数 42 。
+> 由于 "42" 在范围 [-231, 231 - 1] 内，最终结果为 42 。
+
+示例2
+
+> 输入：s = "   -42"
+> 输出：-42
+> 解释：
+> 第 1 步："   -42"（读入前导空格，但忽视掉）
+>          ^
+> 第 2 步："   -42"（读入 '-' 字符，所以结果应该是负数）
+>           ^
+> 第 3 步："   -42"（读入 "42"）
+>             ^
+> 解析得到整数 -42 。
+> 由于 "-42" 在范围 [-231, 231 - 1] 内，最终结果为 -42 。
+
+示例3
+
+> 输入：s = "4193 with words"
+> 输出：4193
+> 解释：
+> 第 1 步："4193 with words"（当前没有读入字符，因为没有前导空格）
+>       ^
+> 第 2 步："4193 with words"（当前没有读入字符，因为这里不存在 '-' 或者 '+'）
+>       ^
+> 第 3 步："4193 with words"（读入 "4193"；由于下一个字符不是一个数字，所以读入停止）
+>           ^
+> 解析得到整数 4193 。
+> 由于 "4193" 在范围 [-231, 231 - 1] 内，最终结果为 4193 。
+
+
+
+题解代码：
+
+```javascript
+s = " -4193 with words";
+var myAtoi = function(s) {
+    let maxValue = Math.pow(2,31)-1;
+    let minValue = maxValue*(-1)-1;
+    if(isNaN(Number.parseInt(s))){
+        return 0;
+    }
+    else{
+        let temp = Number.parseInt(s);
+        if(temp>maxValue) return maxValue;
+        else if(temp<minValue){
+            return minValue;
+        }
+        return temp;
+    }
+};
+result = myAtoi(s);
+console.log(result);
+```
+
+这题没有采用复杂的解法，直接使用了`js`的内置函数`parseInt`来解决。parseInt() 函数可解析一个字符串，并返回一个整数。具体方法可以参考这里：[JavaScript parseInt() 函数 | 菜鸟教程 (runoob.com)](https://www.runoob.com/jsref/jsref-parseint.html)。
+
+后续就是对返回的内容进行判断了。
+
+
+
+
+
+#### 实现strStr()
+
+给你两个字符串 haystack 和 needle ，请你在 haystack 字符串中找出 needle 字符串的第一个匹配项的下标（下标从 0 开始）。如果 needle 不是 haystack 的一部分，则返回  -1 。
+
+示例1
+
+> 输入：haystack = "sadbutsad", needle = "sad"
+> 输出：0
+> 解释："sad" 在下标 0 和 6 处匹配。
+> 第一个匹配项的下标是 0 ，所以返回 0 。
+
+示例2
+
+> 输入：haystack = "leetcode", needle = "leeto"
+> 输出：-1
+> 解释："leeto" 没有在 "leetcode" 中出现，所以返回 -1 。
+
+
+
+题解代码
+
+```javascript
+haystack = "leetcode";
+needle = "leeto";
+var strStr = function(haystack, needle) {
+    return haystack.search(needle);
+};
+result = strStr(haystack,needle);
+console.log(result);
+```
+
+本题的官方推荐解法是使用KMP算法，这里先不用，直接使用js的`search`方法来解决。
+
+search() 方法用于检索字符串中指定的子字符串，或检索与正则表达式相匹配的子字符串。返回匹配对象在检索字符串中的起始位置，如果没有找到任何匹配的子串，则返回 -1。
+
+
+
+
+
+
+
+#### 最长公共前缀
+
+编写一个函数来查找字符串数组中的最长公共前缀。
+
+如果不存在公共前缀，返回空字符串 `""`。
+
+示例1
+
+> 输入：strs = ["flower","flow","flight"]
+> 输出："fl"
+
+示例2
+
+> 输入：strs = ["dog","racecar","car"]
+> 输出：""
+> 解释：输入不存在公共前缀。
+
+
+
+题解代码：
+
+```javascript
+strs = ["flower","flow","flight"];
+var longestCommonPrefix = function(strs) {
+    if (strs == null || strs.length == 0)
+        return "";
+    //默认第一个字符串是他们的公共前缀
+    let pre = strs[0];
+    let i = 1;
+    while(i<strs.length){
+        //不断的截取
+        while(strs[i].indexOf(pre)!==0){
+            pre = pre.substr(0,pre.length-1);
+        }
+        i++;
+    }
+    return pre;
+};
+result = longestCommonPrefix(strs);
+console.log(result);
+```
+
+先取第一个字符串当做他们的公共前缀
+
+然后找出他和第2个字符串的公共前缀，然后再用这个找出的公共前缀分别和第3个，第4个……判断
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
