@@ -1575,37 +1575,50 @@ class Stack{
         this.items = [];
     }
     push(element){      //向栈顶添加元素
-        this.items.push(element);
-    }  
+        return this.items.push(element);
+    }
     pop(){      //从栈顶移除元素
         return this.items.pop();
     }
-    peek(){     //输出栈顶元素（查看栈顶元素）
+    peek(){     //查看栈顶元素
         return this.items[this.items.length-1];
     }
     isEmpty(){      //检查栈是否为空
-        return this.items.length === 0;
+        return this.items.length===0;
     }
-    size(){     //返回栈的长度
-        return this.items.length;
-    }
-    clear(){        //清空栈内元素
+    clear(){        //清空栈
         this.items = [];
     }
-    
+    size(){     //统计栈的长度
+        return this.items.length;
+    }
 }
 
-const stack = new Stack();
-stack.push(78);
-stack.push(98);
-console.log(stack.peek());
-stack.pop();
-console.log(stack.peek());
-console.log(stack.isEmpty());
-console.log(stack.size());
-stack.clear();
-console.log(stack.size());
+const stack = new Stack();      //初始化栈
+console.log(stack.isEmpty());     //判断是否为空
+stack.push(8);      //向栈内插入元素8
+stack.push(5);      //向栈内插入元素5
+console.log(stack.peek());      //查看栈顶元素
+stack.push(56);     //向栈内插入元素56
+console.log(stack.size());      //统计栈的元素个数
+stack.clear();      //清空栈
+console.log(stack.isEmpty());      
+
 ```
+
+注意第二行的`constructor()`方法。
+
+constructor() 方法是一种特殊的方法(构造方法)，用于创建和初始化在类中创建的对象。
+
+创建对象时会自动调用构造方法 constructor()。
+
+如果没有显式指定构造方法，则会添加默认的 constructor 方法。
+
+如果不指定一个构造函数 (constructor) 方法，则使用一个默认的构造函数 (constructor)。
+
+在一个构造方法中可以使用 super 关键字来调用一个父类的构造方法。
+
+
 
 
 
@@ -1616,11 +1629,319 @@ console.log(stack.size());
 这里改版并不大，只是在上面的stack类基础上添加了一个`count`元素统计栈元素的个数。`Stack`类结构如下：
 
 ```javascript
-class stack{	
+class stack{
     constructor(){
-        this.count = 0;		//统计栈元素的个数
-        this.items = {};	
+        this.count = 0;
+        this.items = {};
+    }
+    push(element){
+        this.items[this.count] = element;
+        this.count++;
+    }
+    peek(){
+        if(this.isEmpty()){     //先判断栈是否为空
+            return undefined;
+        }
+        return this.items[this.count-1];
+    }
+    size(){     //返回栈的大小
+        return this.count;
+    }
+    isEmpty(){
+        return  this.count === 0;
+    }
+    pop(){
+        if(this.isEmpty()){     //先判断栈是否为空
+            return undefined;
+        }
+        this.count--;       //提前减一
+        const result = this.items[this.count];      //保存被弹出的元素，用于返回
+        delete this,this.items[this.count];
+        return result;
+    }
+    clear_1(){      //清空栈,直接复原
+        this.items = {};
+        this.count = 0;
+    }
+    clear_2(){      //清空栈，模拟弹出所有元素
+        while(!this.isEmpty()){
+            this.pop();
+        }
+    }
+    toString(){
+        if(this.isEmpty()){
+            return '';
+        }
+        let objString = `${this.items[0]}`;
+        for(let i=1;i<this.count;i++){
+            objString = `${objString},${this.items[i]}`;
+        }
+       return objString; 
     }
 }
+const my_stack = new stack;
+my_stack.push(6);
+my_stack.push(8);
+console.log("The top element is:"+my_stack.peek());
+console.log("stack size is: "+my_stack.size());
+console.log("The delete element is: "+my_stack.pop());
+console.log("stack size is: "+my_stack.size());
+console.log("The top element is:"+my_stack.peek());
+my_stack.push(6);
+my_stack.push(8);
+console.log("num to string is: "+typeof(my_stack.toString()));
+console.log("num to string is: "+my_stack.toString());
+my_stack.clear_2();
+console.log("stack size is: "+my_stack.size());
 ```
 
+在数组版本中，我们不需要关心 toString 方法的实现，因为数据结构可以直接使用数组已经提供的 toString 方法。对于使用对象的版本，我们将创建一个 toString 方法来像数组一样打印出栈的内容。
+
+如果栈是空的，我们只需返回一个空字符串即可。如果它不是空的，就需要用它底部的第一个元素作为字符串的初始值（行{1}），然后迭代整个栈的键（行{2}），一直到栈顶，添加一个逗号（,）以及下一个元素（行{3}）。如果栈只包含一个元素，行{2}和行{3}的代码将不会执行。
+
+
+
+
+
+#### 十进制转二进制
+
+借助栈结构，可以轻松的实现这一功能（不过个人觉得把计算完之后把数组倒着输出也差不多）。
+
+```javascript
+class Stack{
+    constructor(){
+        this.count = 0;
+        this.items = {};
+    }
+    push(element){
+        this.items[this.count] = element;
+        this.count++;
+    }
+    peek(){
+        if(this.isEmpty()){     //先判断栈是否为空
+            return undefined;
+        }
+        return this.items[this.count-1];
+    }
+    size(){     //返回栈的大小
+        return this.count;
+    }
+    isEmpty(){
+        return  this.count === 0;
+    }
+    pop(){
+        if(this.isEmpty()){     //先判断栈是否为空
+            return undefined;
+        }
+        this.count--;       //提前减一
+        const result = this.items[this.count];      //保存被弹出的元素，用于返回
+        delete this.items[this.count];
+        return result;
+    }
+    clear_1(){      //清空栈,直接复原
+        this.items = {};
+        this.count = 0;
+    }
+    clear_2(){      //清空栈，模拟弹出所有元素
+        while(!this.isEmpty()){
+            this.pop();
+        }
+    }
+    toString(){
+        if(this.isEmpty()){
+            return '';
+        }
+        let objString = `${this.items[0]}`;
+        for(let i=1;i<this.count;i++){
+            objString = `${objString},${this.items[i]}`;
+        }
+       return objString; 
+    }
+}
+
+decimalToBinary = function(decimaNum){
+    const remStack = new Stack();
+    let num = decimaNum;
+    let rem;
+    let binaryString = '';
+    while(num>0){
+        rem = num%2;
+        remStack.push(rem);
+        num = parseInt(num/2);
+    }
+    while(!remStack.isEmpty()){
+        binaryString += remStack.pop().toString();
+    }
+    return binaryString;
+}
+result = decimalToBinary(1000);
+console.log(result);
+```
+
+
+
+
+
+#### 任意进制转换
+
+可以将输入的值转换成指定进制，只需要在原来代码上修改少许代码即可
+
+```javascript
+class Stack{
+    constructor(){
+        this.count = 0;
+        this.items = {};
+    }
+    push(element){
+        this.items[this.count] = element;
+        this.count++;
+    }
+    peek(){
+        if(this.isEmpty()){     //先判断栈是否为空
+            return undefined;
+        }
+        return this.items[this.count-1];
+    }
+    size(){     //返回栈的大小
+        return this.count;
+    }
+    isEmpty(){
+        return  this.count === 0;
+    }
+    pop(){
+        if(this.isEmpty()){     //先判断栈是否为空
+            return undefined;
+        }
+        this.count--;       //提前减一
+        const result = this.items[this.count];      //保存被弹出的元素，用于返回
+        delete this.items[this.count];
+        return result;
+    }
+    clear_1(){      //清空栈,直接复原
+        this.items = {};
+        this.count = 0;
+    }
+    clear_2(){      //清空栈，模拟弹出所有元素
+        while(!this.isEmpty()){
+            this.pop();
+        }
+    }
+    toString(){
+        if(this.isEmpty()){
+            return '';
+        }
+        let objString = `${this.items[0]}`;
+        for(let i=1;i<this.count;i++){
+            objString = `${objString},${this.items[i]}`;
+        }
+       return objString; 
+    }
+}
+
+decimalToBinary = function(decimaNum,base){
+    const remStack = new Stack();
+    let num = decimaNum;
+    const digits = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let rem;
+    let binaryString = '';
+    if (!(base >= 2 && base <= 36)) {       //不在转换范围内，退出
+        return '';
+    }
+    while(num>0){
+        rem = num%base;
+        remStack.push(rem);
+        num = parseInt(num/base);
+    }
+    while(!remStack.isEmpty()){
+        binaryString += digits[remStack.pop()];
+    }
+    return binaryString;
+}
+result = decimalToBinary(1000,16);
+console.log(result);
+```
+
+在将十进制转成二进制时，余数是 0 或 1；在将十进制转成八进制时，余数是 0～7；但是将十进制转成十六进制时，余数是 0～9 加上 A、B、C、D、E 和 F（对应 10、11、12、13、14 和 15）。因此，我们需要对栈中的数字做个转化才以。因此，从十一进制开始，字母表中的每个字母将表示相应的基数。字母 A 代表基数 11，B 代表基数 12，以此类推。
+
+
+
+
+
+
+
+
+
+### 队列
+
+一个简单的队列结构
+
+队列是遵循先进先出（FIFO，也称为先来先服务）原则的一组有序的项。队列在尾部添加新元素，并从顶部移除元素。最新添加的元素必须排在队列的末尾。
+
+下面是创建一个简单的队列结构并使用。
+
+```javascript
+class Quene{        
+    constructor(){
+        this.count = 0;
+        this.lowesCount = 0;        //追踪第一个元素
+        this.items = {};    //使用一个对象来储存元素
+    }
+    enquene(element){       //向队列插入元素
+        this.items[this.count] = element;
+        this.count++;
+    }
+    dequene(){      //删除队列第一个元素
+        if(this.isEmpty()){
+            return undefined;
+        }
+        const result = this.items[this.lowesCount];
+        delete this.items[this.lowesCount];
+        this.lowesCount++;
+        return result;
+    }
+    peek(){     //查看对立第一个元素
+        if(this.isEmpty()){
+            return undefined;
+        }
+        return this.items[this.lowesCount];
+    }
+    isEmpty(){      //判断队列是否为空
+        return this.count-this.lowesCount===0;
+        //也可以改写成下面这样
+        // return this.size() === 0;
+    }
+    size(){     //返回队列的长度
+        return this.count-this.lowesCount;
+    }
+    clear(){       //清空队列
+        this.items = {};
+        this.count = 0;
+        this.lowesCount = 0;
+    }
+    toString(){
+        if(this.isEmpty()){
+            return '';
+        }
+        let objString = `${this.items[this.lowesCount]}`;
+        for(let i=this.lowesCount+1;i<this.count;i++){
+            objString = `${objString},${this.items[i]}`;
+        }
+        return objString;
+    }
+}
+
+const quene = new Quene();
+console.log(quene.isEmpty());
+quene.enquene('John');
+quene.enquene('Jack');
+console.log(quene.toString()); // John,Jack
+quene.enquene('Camila');
+console.log(quene.toString()); // John, Jack, Camila
+console.log(quene.size()); // 输出 3
+console.log(quene.isEmpty()); // 输出 false
+quene.dequene(); // 移除 John
+quene.dequene(); // 移除 Jack
+console.log(quene.toString()); // Camila
+```
+
+ 第39行的`toString`函数，在 Stack 类中，我们从索引值为 0 开始迭代 items 中的值。由于 Queue 类中的第一个索引值不一定是 0，我们需要从索引值为 lowestCount 的位置开始迭代队列。
