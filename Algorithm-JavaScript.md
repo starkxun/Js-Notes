@@ -1945,3 +1945,131 @@ console.log(quene.toString()); // Camila
 ```
 
  第39行的`toString`函数，在 Stack 类中，我们从索引值为 0 开始迭代 items 中的值。由于 Queue 类中的第一个索引值不一定是 0，我们需要从索引值为 lowestCount 的位置开始迭代队列。
+
+
+
+
+
+#### 双端队列
+
+双端队列（deque，或称 double-ended queue）是一种允许我们同时从前端和后端添加和移除元素的特殊队列
+
+在计算机科学中，双端队列的一个常见应用是存储一系列的撤销操作。每当用户在软件中进行了一个操作，该操作会被存在一个双端队列中（就像在一个栈里）。当用户点击撤销按钮时，该操作会被从双端队列中弹出，表示它被从后面移除了。在进行了预先定义的一定数量的操作后，最先进行的操作会被从双端队列的前端移除。由于双端队列同时遵守了先进先出和后进先出原则，可以说它是把队列和栈相结合的一种数据结构。
+
+下面是一个双端队列的示例：
+
+```javascript
+class Deque{
+    constructor(){
+        this.count = 0;
+        this.lowCount = 0;
+        this.items = {};
+    }
+    addFront(element){      //在队列头部添加元素
+        if(this.isEmpty()){
+            this.addBack(element);
+        }
+        else if(this.lowCount>0){
+            this.lowCount--;
+            this.items[this.lowCount] = element;
+        }
+        else{
+            for(let i=this.count;i>0;i--){
+                this.items[i] = this.items[i-1];
+            }
+            this.count++;
+            this.lowCount = 0;
+            this.items[0] = element;
+        }
+    }
+    addBack(element){       //在队列尾部添加元素
+        this.items[this.count] = element;
+        this.count++;
+    }
+    removeFront(){      //移除队列首部第一个元素
+        if(this.isEmpty()){
+            return undefined;
+        }
+        const result = this.items[this.lowCount];
+        delete this.items[this.lowCount];
+        this.lowCount++;
+        return result;
+    }
+    removeBack(){       //移除队列最后一个元素
+        if(this.isEmpty()){
+            return undefined;
+        }
+        const result = this.items[this.count];
+        delete this.items[this.count];
+        this.count--;
+        return result;
+    }
+    peekFront(){        //返回队列首部第一个元素
+        if(this.isEmpty()){
+            return undefined;
+        }
+        return this.items[this.lowCount];
+    }
+    peekBack(){     //返回队列尾部第一个元素
+        if(this.isEmpty()){
+            return undefined;
+        }
+        return this.items[this.count];
+    }
+    isEmpty(){
+        return this.count - this.lowCount === 0;
+    }
+    size(){
+        return this.count - this.lowCount;
+    }
+    toString(){
+        if(this.isEmpty()){
+            return '';
+        }
+        let objString = `${this.items[this.lowCount]}`;
+        for(let i=this.lowCount+1;i<this.count;i++){
+            objString = `${objString},${this.items[i]}`;
+        }
+        return objString;
+    }
+}
+
+const deque = new Deque();
+console.log(deque.isEmpty()); // 输出 true
+deque.addBack('John');
+deque.addBack('Jack');
+console.log(deque.toString()); // John, Jack
+deque.addBack('Camila');
+console.log(deque.toString()); // John, Jack, Camila
+console.log(deque.size()); // 输出 3
+console.log(deque.isEmpty()); // 输出 false
+deque.removeFront(); // 移除 John
+console.log(deque.toString()); // Jack, Camila
+deque.removeBack(); // Camila 决定离开
+console.log(deque.toString()); // Jack
+deque.addFront('John'); // John 回来询问一些信息
+console.log(deque.toString()); // John, Jack
+```
+
+这里的代码除了`addFront`方法，其他的方法和前面的队列里的方法都是一样的。下面是`addFront`方法的解释
+
+```javascript
+ addFront(element){      //在队列头部添加元素
+        if(this.isEmpty()){		//队列为空，直接调用addBack方法，避免重复编码
+            this.addBack(element);
+        }
+        else if(this.lowCount>0){		//首元素曾被移除，lowCount会大于等于1
+            this.lowCount--;
+            this.items[this.lowCount] = element;
+        }
+        else{		//队列正常，在插入前需要所有元素整体向后移动一位
+            for(let i=this.count;i>0;i--){
+                this.items[i] = this.items[i-1];
+            }
+            this.count++;
+            this.lowCount = 0;
+            this.items[0] = element;
+        }
+    }
+```
+
