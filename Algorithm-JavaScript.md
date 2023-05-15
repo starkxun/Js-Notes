@@ -1697,7 +1697,7 @@ console.log("stack size is: "+my_stack.size());
 
 在数组版本中，我们不需要关心 toString 方法的实现，因为数据结构可以直接使用数组已经提供的 toString 方法。对于使用对象的版本，我们将创建一个 toString 方法来像数组一样打印出栈的内容。
 
-如果栈是空的，我们只需返回一个空字符串即可。如果它不是空的，就需要用它底部的第一个元素作为字符串的初始值（行{1}），然后迭代整个栈的键（行{2}），一直到栈顶，添加一个逗号（,）以及下一个元素（行{3}）。如果栈只包含一个元素，行{2}和行{3}的代码将不会执行。
+如果栈是空的，我们只需返回一个空字符串即可。如果它不是空的，就需要用它底部的第一个元素作为字符串的初始值，然后迭代整个栈的键，一直到栈顶，添加一个逗号（,）以及下一个元素（行{3}）。如果栈只包含一个元素，行{2}和行{3}的代码将不会执行。
 
 
 
@@ -1999,9 +1999,9 @@ class Deque{
         if(this.isEmpty()){
             return undefined;
         }
+        this.count--;		//提前减一（下标从0计算，count统计的是队列的元素个数）
         const result = this.items[this.count];
         delete this.items[this.count];
-        this.count--;
         return result;
     }
     peekFront(){        //返回队列首部第一个元素
@@ -2072,4 +2072,265 @@ console.log(deque.toString()); // John, Jack
         }
     }
 ```
+
+
+
+
+
+#### 击鼓传花
+
+在这个游戏中，孩子们围成一个圆圈，把花尽快地传递给旁边的人。某一时刻传花停止，这个时候花在谁手里，谁就退出圆圈、结束游戏。重复这个过程，直到只剩一个孩子（胜者）
+
+可以使用队列来模拟这个游戏，代码如下：
+
+```javascript
+function hotPotato(elementList,num){
+    const quene = new Quene();
+    const elimitedList = [];		//被淘汰的人会被
+    for(let i=0;i<elementList.length;i++){
+        quene.enquene(elementList[i]);
+    }
+    while(quene.size()>1){
+        for(let j=0;j<num;j++){
+            quene.enquene(quene.dequene());			//模拟击鼓传花
+        }
+        elimitedList.push(quene.dequene());		//num次后花落在某个人手上，此人被淘汰
+    }
+    return {
+        elimited : elimitedList,
+        winner : quene.dequene()
+    }
+}
+```
+
+完整的代码如下:
+
+```javascript
+class Quene{        
+    constructor(){
+        this.count = 0;
+        this.lowesCount = 0;        //追踪第一个元素
+        this.items = {};    //使用一个对象来储存元素
+    }
+    enquene(element){       //向队列插入元素
+        this.items[this.count] = element;
+        this.count++;
+    }
+    dequene(){      //删除队列第一个元素
+        if(this.isEmpty()){
+            return undefined;
+        }
+        const result = this.items[this.lowesCount];
+        delete this.items[this.lowesCount];
+        this.lowesCount++;
+        return result;
+    }
+    peek(){     //查看对立第一个元素
+        if(this.isEmpty()){
+            return undefined;
+        }
+        return this.items[this.lowesCount];
+    }
+    isEmpty(){      //判断队列是否为空
+        return this.count-this.lowesCount===0;
+        //也可以改写成下面这样
+        // return this.size() === 0;
+    }
+    size(){     //返回队列的长度
+        return this.count-this.lowesCount;
+    }
+    clear(){       //清空队列
+        this.items = {};
+        this.count = 0;
+        this.lowesCount = 0;
+    }
+    //在 Stack 类中，我们从索引值为 0 开始迭代 items 中的值。由于 Queue 类中的第一个索引值不一定是 0，我们需要从索引值为 lowestCount 的位置开始迭代队列。
+    toString(){
+        if(this.isEmpty()){
+            return '';
+        }
+        let objString = `${this.items[this.lowesCount]}`;
+        for(let i=this.lowesCount+1;i<this.count;i++){
+            objString = `${objString},${this.items[i]}`;
+        }
+        return objString;
+    }
+}
+
+
+function hotPotato(elementList,num){
+    const quene = new Quene();
+    const elimitedList = [];
+    for(let i=0;i<elementList.length;i++){
+        quene.enquene(elementList[i]);
+    }
+    while(quene.size()>1){
+        for(let j=0;j<num;j++){
+            quene.enquene(quene.dequene());
+        }
+        elimitedList.push(quene.dequene());
+    }
+    return {
+        elimited : elimitedList,
+        winner : quene.dequene()
+    }
+}
+
+const names = ['John', 'Jack', 'Camila', 'Ingrid', 'Carl'];
+const result = hotPotato(names, 7);
+result.elimited.forEach(name => {
+    console.log(`${name}在击鼓传花游戏中被淘汰。`);
+    });
+console.log(`胜利者： ${result.winner}`);
+```
+
+
+
+
+
+#### 回文数检查器
+
+回文数，通俗来说就是从前往后或者从后往前读每个字符都一样的字符串。例如`adcda`,`gfddfg`。判断一个字符串是否是回文数的方法很简单：将字符串反向排列然后和原字符串比较每一个位置的字符是否相同。
+
+代码如下：
+
+```javascript
+function palindromeChecker(aString){
+    if(aString===undefined||aString===null||(aString!==null&&aString.length===0)){
+        return false;
+    }
+    const deque = new Deque();
+    const lowerString = aString.toLocaleLowerCase().split(' ').join('');        //删除字符串内的空格
+    let isEqual = true;
+    let firstChar,lastChar;
+    for(let i=0;i<lowerString.length;i++){
+        deque.addBack(lowerString.charAt(i));
+    }
+    while(deque.size()>1 && isEqual){       //只有一个字符一定是回文数
+        firstChar = deque.removeFront();
+        lastChar = deque.removeBack();
+        if(firstChar!==lastChar){
+            console.log(firstChar);
+            console.log(lastChar);
+             isEqual=false;
+        }
+    }
+    return isEqual;
+}
+```
+
+这里的思路和前面提到的差不多，同时取出双端队列的首元素和尾元素进行比较，如果有不满足条件的，就结束循环，返回结果。
+
+完整代码：
+
+```javascript
+class Deque{
+    constructor(){
+        this.count = 0;
+        this.lowCount = 0;
+        this.items = {};
+    }
+    addFront(element){      //在队列头部添加元素
+        if(this.isEmpty()){
+            this.addBack(element);
+        }
+        else if(this.lowCount>0){
+            this.lowCount--;
+            this.items[this.lowCount] = element;
+        }
+        else{
+            for(let i=this.count;i>0;i--){
+                this.items[i] = this.items[i-1];
+            }
+            this.count++;
+            this.lowCount = 0;
+            this.items[0] = element;
+        }
+    }
+    addBack(element){       //在队列尾部添加元素
+        this.items[this.count] = element;
+        this.count++;
+    }
+    removeFront(){      //移除队列首部第一个元素
+        if(this.isEmpty()){
+            return undefined;
+        }
+        const result = this.items[this.lowCount];
+        delete this.items[this.lowCount];
+        this.lowCount++;
+        return result;
+    }
+    removeBack(){       //移除队列最后一个元素
+        if(this.isEmpty()){
+            return undefined;
+        }
+        this.count--;       //提前减一（下标从0计算，count统计的是队列的元素个数）
+        const result = this.items[this.count];
+        delete this.items[this.count];
+        return result;
+    }
+    peekFront(){        //返回队列首部第一个元素
+        if(this.isEmpty()){
+            return undefined;
+        }
+        return this.items[this.lowCount];
+    }
+    peekBack(){     //返回队列尾部第一个元素
+        if(this.isEmpty()){
+            return undefined;
+        }
+        return this.items[this.count];
+    }
+    isEmpty(){
+        return this.count - this.lowCount === 0;
+    }
+    size(){
+        return this.count - this.lowCount;
+    }
+    toString(){
+        if(this.isEmpty()){
+            return '';
+        }
+        let objString = `${this.items[this.lowCount]}`;
+        for(let i=this.lowCount+1;i<this.count;i++){
+            objString = `${objString},${this.items[i]}`;
+        }
+        return objString;
+    }
+}
+
+function palindromeChecker(aString){
+    if(aString===undefined||aString===null||(aString!==null&&aString.length===0)){
+        return false;
+    }
+    const deque = new Deque();
+    const lowerString = aString.toLocaleLowerCase().split(' ').join('');        //删除字符串内的空格
+    let isEqual = true;
+    let firstChar,lastChar;
+    for(let i=0;i<lowerString.length;i++){
+        deque.addBack(lowerString.charAt(i));
+    }
+    while(deque.size()>1 && isEqual){       //只有一个字符一定是回文数
+        firstChar = deque.removeFront();
+        lastChar = deque.removeBack();
+        if(firstChar!==lastChar){
+            console.log(firstChar);
+            console.log(lastChar);
+             isEqual=false;
+        }
+    }
+    return isEqual;
+}
+
+console.log('a', palindromeChecker('a'));
+console.log('aa', palindromeChecker('aa'));
+console.log('kayak', palindromeChecker('kayak'));
+console.log('level', palindromeChecker('level'));
+console.log('Was it a car or a cat I saw', palindromeChecker('Was it a caror a cat I saw'));
+console.log('Step on no pets', palindromeChecker('Step on no pets'));
+```
+
+测试结果都为`true`.
+
+
 
