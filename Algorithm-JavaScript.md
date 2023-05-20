@@ -2334,3 +2334,286 @@ console.log('Step on no pets', palindromeChecker('Step on no pets'));
 
 
 
+
+
+### 链表
+
+相对于传统的数组，链表的一个好处在于，添加或移除元素的时候不需要移动其他元素。然而，链表需要使用指针，因此实现链表时需要额外注意。在数组中，我们可以直接访问任何位置的任何元素，而要想访问链表中间的一个元素，则需要从起点（表头）开始迭代链表直到找到所需的元素。
+
+
+
+#### 创建链表
+
+教材上的案例使用的是复用的方法，但是需要使用babel进行转换，由于环境没有配置好， 无法编译通过。所以这里将所有代码放在同一份文件中。
+
+下面是创建一个链表的大体框架：
+
+```javascript
+function defaultEquals(a, b) {
+    return a === b;
+}
+
+class LinkedList{
+    constructor(equalsFn = defaultEquals){      
+        this.count = 0;		//存储链表元素数量
+        this.head = undefined;		//链表的头元素
+        this.equalsFn = equalsFn;	//判断是否相等
+    }
+}
+```
+
+要表示链表中的第一个以及其他元素，我们需要一个助手类，叫作 Node（行{1}）。Node类表示我们想要添加到链表中的项。它包含一个 element 属性，该属性表示要加入链表元素的值；以及一个 next 属性，该属性是指向链表中下一个元素的指针：
+
+```javascript
+class Node {
+    constructor(element, next) {
+      this.element = element;	//链表当前节点的元素
+      this.next = next;		//指向下一个节点的指针
+    }
+}
+```
+
+接下来就是实现`LinkList`的各种方法了。
+
+
+
+
+
+#### 向链表尾部添加元素
+
+向 LinkedList 对象尾部添加一个元素时，可能有两种场景：链表为空，添加的是第一个元素；链表不为空，向其追加元素。下面是实现：
+
+```javascript
+push(element){
+    const node = new Node(element);      
+    if(this.head == null){      //如果链表为空，直接在头节点插入
+        this.head = node;
+    }
+    else{
+        let current = this.head;  
+        while(current.next!=null){		//从头节点迭代到尾部最后一个节点
+            current = current.next;
+        }
+        current.next =node;		//在尾部添加元素
+    }
+    this.count++;
+}  
+```
+
+
+
+
+
+#### 从链表中移除元素
+
+我们要实现两种 remove 方法：第一种是从特定位置移除一个元素（removeAt），第二种是根据元素的值移除元素（稍后我们会展示第二种 remove 方法）。和 push 方法一样，对于从链表中移除元素也存在两种场景：第一种是移除第一个元素，第二种是移除第一个元素之外的其他元素。
+
+下面实现一个从特定位置移除元素的方法：
+
+```javascript
+removeAt_1(index){        //移除指定位置的元素
+    if(index >=0 && index < this.count){		//判断是否越界
+        let current = this.head;
+
+    if(index===0){		
+        this.head = current.next;	//如果要移除第一个元素，把head赋值为第二个元素即可
+    }
+    else{
+        let previous;
+        for(let i=0;i<index;i++){
+            previous = current;
+            current = current.next;
+        }
+        // 将 previous 与 current 的下一项链接起来：跳过 current，从而移除它
+        previous.next = current.next;
+    }
+    this.count--;
+    return  current.element;
+    }
+    return undefined;
+}
+```
+
+
+
+
+
+#### 循环迭代链表直到指定位置
+
+由于循环迭代这个功能在链表里面经常被复用，例如`removeAt_1`方法中就对链表进行了迭代。所以可以把这部分抽离出来，方便在其他方法中进行调用。
+
+```javascript
+getElementAt(index){        //循环迭代到指定位置
+    if(index >= 0 && index <= this.count){
+        let current = this.head;
+        for(let i = 0;i < index && current != null;i++){
+            current = current.next;
+        }
+        return current;
+    }
+    return undefined;
+}
+```
+
+接下来可以用`getElementAt`方法来重构`removeAt_1`方法，如下：
+
+```javascript
+removeAt_2(index){
+    if(index >=0 && index < this.count){
+        let current = this.head;
+        if(index === 0){
+            this.head = current.next;
+        }
+        else{
+            const previous = this.getElementAt(index-1);   //idnex-1的目的是保证删除的元素是index位置的
+            current = previous.next;      //如果要将index-1改成index，可以将这里改写成current=previous
+            previous.next = current.next;
+        }
+        this.count--;
+        return current.element;
+    }
+    return undefined;
+}
+```
+
+
+
+
+
+#### 在任意位置插入元素
+
+接下来实现`insert`方法
+
+```javascript
+insert(element,index){          //在任意位置插入元素
+    if(index >=0 && index <= this.count){
+        const node = new Node(element);		//new一个新的节点
+        if(index === 0){        // 如果是在头部插入
+            const curren = this.head;
+            node.next = curren;
+            this.head = node;
+        }
+        else{
+            const previous = this.getElementAt(index-1);
+            const curren = previous.next;
+            node.next = curren;
+            previous.next = node;
+        }
+        this.count++;
+        return true;
+    }
+    return false;
+}
+```
+
+
+
+
+
+#### 返回一个元素的位置
+
+indexOf 是我们下一个要实现的方法。indexOf 方法接收一个元素的值，如果在链表中找到了它，就返回元素的位置，否则返回-1。
+
+```javascript
+indexOf(element){       //在列表中查找指定元素
+    let curren = this.head;
+    for(let i=0;i<this.count&&curren!=null;i++){
+        if(this.equalsFn(element,curren.element)){return i;}
+        curren = curren.next;
+    }
+    return -1;
+}
+```
+
+
+
+
+
+#### 从链表中移除元素
+
+和前面的`removeAt_1`方法不同的是，这里是在链表中找到指定元素，然后移除。和`index`方法配合使用。
+
+```javascript
+remove(element){        //在列表中删除指定元素
+    const index = this.indexOf(element);
+    return this.removeAt_2(index);
+}
+```
+
+
+
+
+
+#### 打印列表所有元素
+
+```javascript
+dispaly(){      //打印链表所有元素
+    if(this.count === 0){
+        console.log("The linkList is empty");
+        return;
+    }
+    let current = this.head;
+    for(let i=0;i<this.count;i++){
+        process.stdout.write(current.element+' ');		//打印当前节点元素（不换行）
+        current = current.next;  	//迭代下一个元素
+    }
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+#### isEmpty、size 和 getHead 方法
+
+这里很简单，直接返回结果即可：
+
+```javascript
+size(){
+    return this.count;
+}
+
+isEmpty(){
+    return this.size()===0;
+}
+
+getHead(){
+    return this.head;
+}
+```
+
+
+
+
+
+
+
+#### toString方法
+
+toString 方法会把 LinkedList 对象转换成一个字符串。下面是 toString 方法的实现。
+
+```javascript
+toString(){
+    if(this.head == null){
+        return '';
+    }
+    let objString = `${this.head.element}`;
+    let curren = this.head.next;
+    for(let i=1;i<this.size()&&curren!=null;i++){
+        objString = `${objString},${curren.element}`;
+        curren = curren.next;
+    }
+    return objString;
+}
+```
+
+
+
+
+
